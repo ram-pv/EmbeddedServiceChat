@@ -1,0 +1,141 @@
+<html>
+<style type='text/css'>
+        .embeddedServiceHelpButton .helpButton .uiButton {
+        background-color: #1D2F50;
+        font-family: "Salesforce Sans", sans-serif;
+        }
+        .embeddedServiceHelpButton .helpButton .uiButton:focus {
+        outline: 1px solid #1D2F50;
+        }   
+        body .message, .slds-vf-scope .message {
+        background-color: transparent!important;
+        }
+        @font-face {
+        font-family: 'Salesforce Sans';
+        src: url('https://c1.sfdcstatic.com/etc/clientlibs/sfdc-aem-master/clientlibs_base/fonts/SalesforceSans-Regular.woff') format('woff'),
+        url('https://c1.sfdcstatic.com/etc/clientlibs/sfdc-aem-master/clientlibs_base/fonts/SalesforceSans-Regular.ttf') format('truetype');
+        }
+    </style>
+
+<script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script>
+<apex:includeScript value="https://code.jquery.com/jquery-3.6.0.min.js"/>
+
+<script type='text/javascript'>	
+	var initESW = function(gslbBaseURL) {
+        embedded_svc.settings.displayHelpButton = true; //Or false
+		embedded_svc.settings.language = ''; //For example, enter 'en' or 'en-US'
+
+		//embedded_svc.settings.defaultMinimizedText = '...'; //(Defaults to Chat with an Expert)
+		embedded_svc.settings.disabledMinimizedText = 'Chat Unavailable'; //(Defaults to Agent Offline)      
+               
+
+		//embedded_svc.settings.loadingText = ''; //(Defaults to Loading)
+		//embedded_svc.settings.storageDomain = 'yourdomain.com'; //(Sets the domain for your deployment so that visitors can navigate subdomains during a chat session)
+
+		// Settings for Chat
+		//embedded_svc.settings.directToButtonRouting = function(prechatFormData) {
+			// Dynamically changes the button ID based on what the visitor enters in the pre-chat form.
+			// Returns a valid button ID.
+		//};
+		//embedded_svc.settings.prepopulatedPrechatFields = {}; //Sets the auto-population of pre-chat form fields
+		//embedded_svc.settings.fallbackRouting = []; //An array of button IDs, user IDs, or userId_buttonId
+		//embedded_svc.settings.offlineSupportMinimizedText = '...'; //(Defaults to Contact Us)
+
+		embedded_svc.settings.enabledFeatures = ['LiveAgent'];
+		embedded_svc.settings.entryFeature = 'LiveAgent';
+
+        //added for stopping contact creation
+        embedded_svc.settings.extraPrechatInfo = [{
+            "entityFieldMaps": [{
+                "doCreate":false,
+                "doFind":false,
+                "fieldName":"LastName",
+                "isExactMatch":true,
+                "label":"Last Name"
+            }, {
+                "doCreate":false,
+                "doFind":false,
+                "fieldName":"FirstName",
+                "isExactMatch":true,
+                "label":"First Name"
+            }, {
+                "doCreate":false,
+                "doFind":false,
+                "fieldName":"Email",
+                "isExactMatch":true,
+                "label":"Email"
+            }],
+            "entityName":"Contact"
+        }]; 
+        //ended
+        
+		//added for stopping case creation
+        embedded_svc.settings.extraPrechatInfo = [{
+            "entityFieldMaps": [
+                {
+                    "doCreate":false,
+                    "doFind":false,
+                    "fieldName":"Chat_Reason__c",
+                    "isExactMatch":true,
+                    "label":"What are you contacting us about today?"
+                }],
+            "entityName":"Case"
+        }]; 
+		//ended
+    
+        //storing custom field values from Prechat form
+    	embedded_svc.settings.extraPrechatFormDetails = [
+        {
+            "label":"First Name", 
+        	"transcriptFields": ["Visitor_First_Name__c"]
+        },
+        {
+        	"label":"Last Name", 
+        	"transcriptFields": ["Visitor_Last_Name__c"]
+        },
+        {
+        	"label":"Email", 
+        	"transcriptFields": ["Visitor_Email__c"]
+        },
+        {
+        	"label":"What are you contacting us about today?", 
+        	"transcriptFields": ["Chat_Reason__c"]
+        },
+        {
+        	"label":"Originating Url",
+    		"value":"Marketing",
+    		"transcriptFields":["Originating_Url__c"],
+    		"displayToAgent":true
+		}
+    	];
+        
+        
+		embedded_svc.init(
+			'https://idg-sf--dev.sandbox.my.salesforce.com',
+			'https://idg-sf--dev.sandbox.my.salesforce-sites.com/liveagent',
+			gslbBaseURL,
+			'00DZ000000MiRxs',
+			'LCDemo1_Group',
+			{
+				baseLiveAgentContentURL: 'https://c.la1-c1cs-ia6.salesforceliveagent.com/content',
+				deploymentId: '572DG0000004Cdr',
+				buttonId: '573DG0000004ClC',
+				baseLiveAgentURL: 'https://d.la1-c1cs-ia6.salesforceliveagent.com/chat',
+				eswLiveAgentDevName: 'LCDemo1_Group',
+				isOfflineSupportEnabled: false
+			}
+		);
+	};
+
+	if (!window.embedded_svc) {
+		var s = document.createElement('script');
+		s.setAttribute('src', 'https://idg-sf--dev.sandbox.my.salesforce.com/embeddedservice/5.0/esw.min.js');
+		s.onload = function() {
+			initESW(null);
+		};
+		document.body.appendChild(s);
+	} else {
+		initESW('https://service.force.com');
+	}
+</script>
+</html>
